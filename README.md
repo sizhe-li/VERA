@@ -222,11 +222,13 @@ Released under the **MIT License** (see `LICENSE`); depended-upon code retains i
 **cotracker/AllTracker**; the DFoT/DiT backbones are adapted from `facebookresearch/DiT` and `NVlabs/edm2`.
 
 ```bibtex
-@article{li2026vera,
-  title   = {Turning Video Models into Generalist Robot Policies},
-  author  = {Li, Sizhe Lester and Kim, Evan and Bai, Xingjian and Zhao, Tong and
-             Pang, Tao and Simchowitz, Max and Sitzmann, Vincent},
-  journal = {arXiv preprint arXiv:2605.27817},
-  year    = {2026}
+@article{li2026turningvideomodelsgeneralist,
+      title={Turning Video Models into Generalist Robot Policies}, 
+      author={Sizhe Lester Li and Evan Kim and Xingjian Bai and Tong Zhao and Tao Pang and Max Simchowitz and Vincent Sitzmann},
+      year={2026},
+      eprint={2605.27817},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2605.27817}, 
 }
 ```
