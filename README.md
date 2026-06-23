@@ -1,7 +1,5 @@
 <h1 align="center">VERA — Turning Video Models into Generalist Robot Policies</h1>
 
-<p align="center"><b>Decouple planning. Translate faithfully.</b></p>
-
 <p align="center">
   Sizhe Lester Li<sup>*</sup>,
   Evan Kim<sup>*</sup>,
