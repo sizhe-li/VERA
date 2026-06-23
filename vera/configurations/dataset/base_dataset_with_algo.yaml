@@ -1,0 +1,26 @@
+# Single base for action + motion_policy: Dataset class fields + algorithm-facing fields.
+# All non-legacy dataset configs extend this (or a dataset-specific base that extends this).
+# Algorithm (e.g. dfot_motion_policy_joint) reads ${dataset.observation_shape}, ${dataset.max_frames}, etc.
+
+defaults:
+  - base_dataset
+
+# Algorithm-facing defaults (override per dataset)
+save_dir: ???
+frame_skip: 1
+max_frames: 32
+context_length: 4
+resolution: 128
+n_frames: ${dataset.max_frames}
+observation_shape: [3, "${dataset.resolution}", "${dataset.resolution}"]
+data_mean: [[[0.0]], [[0.0]], [[0.0]], [[0.0]], [[0.0]]]
+data_std: [[[1.0]], [[1.0]], [[1.0]], [[1.0]], [[1.0]]]
+latent:
+  enable: false
+  type: pre_sample
+  suffix: null
+  downsampling_factor: [1, 8]
+  num_channels: 4
+external_cond_dim: 0
+external_cond_stack: false
+external_cond_processing: null

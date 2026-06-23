@@ -1,0 +1,35 @@
+defaults:
+- mimicgen
+# v3 = fully rebuilt pack with megaflow on 2026-05-11.
+# - 9 source roots (coffee_d0/d1, square_d0/d1/d2, stack_d0/d1, stack_three_d0/d1)
+# - 9000 episodes, properly partitioned: 1 shard per task
+# - Each shard has DISTINCT content (verified RGB hashes differ across shards)
+# Old `mimicgen_packed` had a packing bug where all shards held the same task's
+# data (bit-for-bit identical demo_X.npz across all 9 shards) — verified
+# 2026-05-11 by hashing demo_0/100/500/900 across all shards.
+root: ${oc.env:VERA_DATA_PREFIX,/path/to/data}/datasets/jacobian/mimicgen_packed_v3_megaflow
+load_motion_tracks: false
+action_normalization_mode: symmetric_percentile
+action_percentile: 90.0
+# Recomputed 2026-05-11 from v3 megaflow pack:
+#   72 episodes (8 per shard × 9 shards), seed=0
+#   actions: 13776 samples of [twist*50, gripper*80] via SE3 finite-diff
+#   flow: 16 frames/episode/view × 2 views, ::8 spatial subsample
+# Old `mimicgen_packed.yaml` stats were measured on the corrupted pack
+# (all shards held one task) — under-scaled rot-z 2.6× and gripper 2.3×,
+# which is why gripper dim trained poorly.
+action_abs_scale:
+- 0.6796985941625691
+- 0.6448074772373892
+- 0.41294634130973895
+- 0.4190512830511862
+- 0.5592999664973295
+- 2.1374075954804126
+- 0.12687727808952332
+flow_normalization_space: raw_fullres
+flow_normalization_mode: symmetric_percentile
+oflow_scale: null
+oflow_percentile: 90.0
+oflow_abs_scale:
+- 9.53781509399414
+- 8.301469802856445

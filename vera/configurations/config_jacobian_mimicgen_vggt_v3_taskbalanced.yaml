@@ -1,0 +1,152 @@
+defaults:
+  - config
+  - /dataset/mimicgen_packed_v3@validation_datasets.coffee_d0
+  - /dataset/mimicgen_packed_v3@validation_datasets.coffee_d1
+  - /dataset/mimicgen_packed_v3@validation_datasets.square_d0
+  - /dataset/mimicgen_packed_v3@validation_datasets.square_d1
+  - /dataset/mimicgen_packed_v3@validation_datasets.square_d2
+  - /dataset/mimicgen_packed_v3@validation_datasets.stack_d0
+  - /dataset/mimicgen_packed_v3@validation_datasets.stack_d1
+  - /dataset/mimicgen_packed_v3@validation_datasets.stack_three_d0
+  - /dataset/mimicgen_packed_v3@validation_datasets.stack_three_d1
+  - override /experiment: jacobian_learning
+  - override /dataset: mimicgen_packed_v3
+  - override /algorithm: image_jacobian
+  - override /algorithm/model: droid_vggt_jacobian
+  - _self_
+
+# Iterate every validation_datasets entry every val pass so all 9 tasks viz
+# regardless of shuffle seed. With the v3 dataset, each shard truly contains
+# distinct task data (unlike v1 which had duplicated content across shards).
+validation_include_all: true
+
+experiment:
+  tasks: [training]
+  training:
+    batch_size: 16
+    lr: 5e-5
+    max_steps: 600000
+    log_every_n_steps: 20
+    enable_progress_bar: true
+    progress_bar_refresh_rate: 1
+    optim:
+      accumulate_grad_batches: 1
+    data:
+      num_workers: 14
+      pin_memory: true
+      prefetch_factor: 8
+      persistent_workers: true
+      cache:
+        video: 0
+        zarr: 0
+        droid_h5: 0
+        trajectory: 64
+        npz: 256
+    checkpointing:
+      every_n_train_steps: 1000
+      save_top_k: 1
+      save_last: true
+      monitor: loss/training/total
+      mode: min
+
+  validation:
+    batch_size: 1
+    shuffle: false
+    val_every_n_step: 1000
+    num_sanity_val_steps: 1
+    limit_batch: 1
+    data:
+      shuffle: false
+      num_workers: 2
+      pin_memory: true
+      prefetch_factor: 2
+      persistent_workers: true
+      cache:
+        video: 0
+        zarr: 0
+        droid_h5: 0
+        trajectory: 0
+        npz: 4
+
+  find_unused_parameters: false
+
+dataset:
+  metadata_cache_mode: load_or_build
+  force_rebuild: false
+  perf_log_every_n_samples: 0
+  resolution: 128
+  max_frames: 8
+  context_length: 4
+  sampling:
+    num_frames: 8
+  load_motion_tracks: false
+
+# 9 per-task validation pins. Each uses overfit_idx to lock the dataset to a
+# single deterministic episode from the corresponding shard.
+#   shard_000000 → coffee_d0       eps [0..999]   pin → 100
+#   shard_000001 → coffee_d1       eps [1000..1999]  pin → 1100
+#   shard_000002 → square_d0       eps [2000..2999]  pin → 2100
+#   shard_000003 → square_d1       eps [3000..3999]  pin → 3100
+#   shard_000004 → square_d2       eps [4000..4999]  pin → 4100
+#   shard_000005 → stack_d0        eps [5000..5999]  pin → 5100
+#   shard_000006 → stack_d1        eps [6000..6999]  pin → 6100
+#   shard_000007 → stack_three_d0  eps [7000..7999]  pin → 7100
+#   shard_000008 → stack_three_d1  eps [8000..8999]  pin → 8100
+validation_datasets:
+  coffee_d0:       { overfit_idx: 100 }
+  coffee_d1:       { overfit_idx: 1100 }
+  square_d0:       { overfit_idx: 2100 }
+  square_d1:       { overfit_idx: 3100 }
+  square_d2:       { overfit_idx: 4100 }
+  stack_d0:        { overfit_idx: 5100 }
+  stack_d1:        { overfit_idx: 6100 }
+  stack_three_d0:  { overfit_idx: 7100 }
+  stack_three_d1:  { overfit_idx: 8100 }
+
+algorithm:
+  supervision: flow
+  inverse_action_weight: 0.1
+  motion_aware_flow_weighting: true
+  motion_aware_flow_threshold: 0.02
+  motion_aware_moving_weight: 8.0
+  view_flow_balance_mode: active_pixels
+  view_balance_min_active_ratio: 0.01
+  view_balance_max_view_weight: 5.0
+  view_balanced_flow_loss: true
+  log_flow_per_view: true
+  # --- pmap-style regularizers (VGGT arXiv:2503.11651 §3.4 adaptation) ---
+  # Target: floaters (isolated high-|J| pixels in no-motion regions) + temporal jitter.
+  flow_gradient_weight: 0.25      # (2) match grad(achieved flow) to grad(GT flow): edge coherence
+  jacobian_tv_weight: 0.05        # (3) edge-aware TV directly on J: the floater killer
+  jacobian_tv_edge_aware: true
+  jacobian_tv_edge_beta: 10.0
+  predict_uncertainty: true       # (1) aleatoric per-pixel confidence head + -alpha*log(conf)
+  pmap_uncertainty_weight: 1.0
+  model:
+    pretrained_model_id: facebook/VGGT-1B
+    checkpoint_path: null
+    freeze_aggregator: false
+    output_scale: 1.0
+    predict_uncertainty: true     # build the softplus confidence head on the DPT decoder
+  logging:
+    loss_freq: 20
+    max_validation_batches: 1
+    max_validation_samples: 1
+    max_validation_views: 2
+    # Cap is GLOBAL across the entire val pass (resets once in on_validation_start).
+    # With 10 dataloaders (1 "all" + 9 per-task) × 2 views = 20 video groups. The
+    # previous value of 9 truncated to ~4.5 dataloaders, dropping stack/stack_three
+    # videos entirely. Set to 24 with headroom in case dataloader count grows.
+    max_num_videos: 24
+    max_validation_frames: 8
+
+wandb:
+  project: jacobian-mimicgen
+  group: mimicgen-vggt-1b-panda-v3-taskbalanced
+  tags: [mimicgen, vggt-1b, jacobian, panda, two-view, all-tasks, v3, taskbalanced-viz, h200, freshstart]
+
+hydra:
+  run:
+    dir: ${oc.env:VERA_DATA_PREFIX,/path/to/data}/datasets/jacobian/wandb_runs/${now:%Y-%m-%d}/${now:%H-%M-%S}_${name}
+  sweep:
+    dir: ${oc.env:VERA_DATA_PREFIX,/path/to/data}/datasets/jacobian/wandb_runs/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}

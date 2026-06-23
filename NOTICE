@@ -1,0 +1,51 @@
+VERA — Turning Video Models into Generalist Robot Policies
+Copyright (c) 2026 The VERA authors.
+
+This product is released under the MIT License (see LICENSE). It includes or
+adapts third-party components that remain under their own licenses. Consult each
+upstream project for the authoritative license text before redistribution or
+commercial use.
+
+-------------------------------------------------------------------------------
+Bundled / adapted in this repository
+-------------------------------------------------------------------------------
+
+* Wan2.1 (text-to-video / image-to-video diffusion backbone)
+  vera/video_model/algorithms/wan/
+  Copyright (c) Alibaba Group. Licensed under the Apache License 2.0.
+  https://github.com/Wan-Video/Wan2.1
+
+* DiT — Scalable Diffusion Models with Transformers
+  Portions of the diffusion-transformer backbones under vera/idm/ are adapted
+  from facebookresearch/DiT. Copyright (c) Meta Platforms, Inc. (CC-BY-NC /
+  see upstream). https://github.com/facebookresearch/DiT
+
+* EDM2 — Elucidating the Design Space of Diffusion-Based Generative Models
+  Portions of the network/preconditioning utilities are adapted from NVlabs/edm2.
+  Copyright (c) NVIDIA Corporation. Licensed under CC BY-NC-SA 4.0.
+  https://github.com/NVlabs/edm2
+
+* CLIP / open_clip (image-text encoders)
+  Copyright (c) OpenAI / ML Foundations. Licensed under the MIT License.
+  https://github.com/openai/CLIP  ·  https://github.com/mlfoundations/open_clip
+
+* Research project template
+  Portions of the experiment/training scaffolding are adapted from the
+  research-template by Boyuan Chen. Licensed under the MIT License.
+
+-------------------------------------------------------------------------------
+Required at install / run time (not vendored here)
+-------------------------------------------------------------------------------
+
+* VGGT — Visual Geometry Grounded Transformer (IDM visual backbone)
+  Installed as a dependency from facebookresearch/vggt; weights pulled from
+  facebook/VGGT-1B. Copyright (c) Meta Platforms, Inc. / University of Oxford.
+  See upstream for license terms. https://github.com/facebookresearch/vggt
+
+* CoTracker / AllTracker (point trackers used by the world-model planner)
+  Copyright (c) Meta Platforms, Inc. See upstream for license terms.
+  https://github.com/facebookresearch/co-tracker
+
+Wan2.1 base weights (Wan-AI/Wan2.1-T2V-1.3B) and the VGGT-1B weights are
+distributed by their original authors under their own terms and are not
+re-hosted by this project.

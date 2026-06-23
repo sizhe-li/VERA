@@ -1,0 +1,12 @@
+name: dpt_vggt_fusion
+command_dim: 2
+spatial_dim: 2
+image_size: ${dataset.resolution}
+backbone_preset: small
+neck_preset: M
+fusion_channels: 128
+prediction_hidden_channels: 64
+use_uv_coords: true
+uv_fourier_frequencies: 10
+output_scale: 1.0
+freeze_backbone: true

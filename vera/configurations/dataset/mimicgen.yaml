@@ -1,0 +1,39 @@
+defaults:
+  - base_dataset_with_algo
+
+name: robomimic
+robot_name: eef_gripper
+env_name: lift_se3
+# Per-embodiment IDM action model (vera/datasets/core/actions.py). Panda eef SE(3)-quat
+# finite-diff twist + gripper — matches okto RobomimicLiftSE3DeltaAction.
+action_mode: se3_quat
+# Multi-root; override in mimicgen_engaging.yaml or via CLI
+root: ???
+overfit_idx: null
+resolution: 128
+
+max_frames: 8
+context_length: 4
+
+sampling:
+  num_frames: "${dataset.max_frames}"
+  linearize_time_length: 1
+
+camera:
+  views: ["agentview_image", "robot0_eye_in_hand_image"]
+  image_size: ["${dataset.resolution}", "${dataset.resolution}"]
+
+load_motion_tracks: true
+
+# Zero flow and mask motion tracks for last N px (original height) on eye_in_hand views. Set to null to disable.
+eye_in_hand_mask_bottom_px: 80
+oflow_scale: 0.1
+flow_scale_factor: 1.0
+du_scale: 1.0
+
+# Algorithm-facing
+save_dir: data/mimicgen_placeholder
+observation_shape: [5, "${dataset.resolution}", "${dataset.resolution}"]
+
+data_mean: [[[0.0]], [[0.0]], [[0.0]], [[0.0]], [[0.0]]]
+data_std: [[[1.0]], [[1.0]], [[1.0]], [[1.0]], [[1.0]]]

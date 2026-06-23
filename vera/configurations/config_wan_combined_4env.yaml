@@ -1,0 +1,52 @@
+# Train the OMNI 14B I2V (N=6, M=4) WAN video model on the self-contained
+# combined_4env cross-embodiment mixture, end-to-end via vera.main.
+#
+# Run:
+#   python -m vera.main --config-name=config_wan_combined_4env \
+#       experiment.training.max_steps=2 experiment.training.batch_size=1
+#
+# Model init: finetune from the exported OMNI step-9000 checkpoint
+# (algorithm.model.tuned_ckpt_path in wan_i2v.yaml). The WAN model is built on
+# meta from the I2V base config.json then loaded with the OMNI weights.
+
+defaults:
+  - config
+  - override /experiment: video_generation
+  - override /dataset: combined_4env
+  - override /algorithm: wan_i2v
+  - _self_
+
+experiment:
+  tasks: [training]
+  strategy: auto                # set to fsdp for multi-GPU 14B training
+  training:
+    batch_size: 1
+    lr: 6.0e-06
+    precision: bf16-mixed
+    max_steps: 10000000
+    log_every_n_steps: 1
+    optim:
+      accumulate_grad_batches: 4
+    data:
+      num_workers: 4
+    checkpointing:
+      every_n_train_steps: 2000
+      save_top_k: 1
+      save_last: true
+  validation:
+    num_sanity_val_steps: 0
+    val_every_n_step: 2000
+    limit_batch: 1
+    data:
+      num_workers: 1
+
+wandb:
+  project: vera-video-wan
+  group: omni-combined-4env
+  tags: [wan, i2v, omni, combined_4env, 14b, h200]
+
+hydra:
+  run:
+    dir: ${oc.env:VERA_DATA_PREFIX,/path/to/data}/datasets/jacobian/wandb_runs/${now:%Y-%m-%d}/${now:%H-%M-%S}_${name}
+  sweep:
+    dir: ${oc.env:VERA_DATA_PREFIX,/path/to/data}/datasets/jacobian/wandb_runs/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}

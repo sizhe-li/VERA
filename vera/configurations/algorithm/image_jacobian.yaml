@@ -1,0 +1,53 @@
+defaults:
+  - base_pytorch_algo
+  - model: iiwa
+
+name: image_jacobian
+supervision: flow # options: flow, tracks, flow+tracks
+flow_loss: charbonnier
+flow_charbonnier_eps: 0.001
+inverse_action_weight: 0.0
+inverse_action_damping: 0.01
+
+# pmap-style regularization (adapted from VGGT point-map loss). All OFF by default.
+flow_gradient_weight: 0.0
+jacobian_tv_weight: 0.0
+jacobian_tv_edge_aware: True
+jacobian_tv_edge_beta: 10.0
+predict_uncertainty: False
+pmap_uncertainty_weight: 0.0
+
+robot_name: ${dataset.robot_name}
+image_size: ${dataset.camera.image_size}
+
+compile: False
+
+optimizer:
+  name: adamw
+  weight_decay: 0.00001
+  optimizer_beta: [0.9, 0.99]
+
+  # lr_scheduler:
+  #   name: constant_with_warmup
+  #   num_warmup_steps: 5000
+
+logging:
+  loss_freq: 100
+  grad_norm_freq: null
+  deterministic: 0
+  max_num_videos: 2
+  max_validation_batches: 1
+  max_validation_samples: 1
+  max_validation_frames: 4
+  max_validation_views: 1
+
+  # n_metrics_frames: null
+  # metrics:
+  #   - fvd
+  # metrics_batch_size: 16
+  # sanity_generation: False # generate video samples during sanity check
+  # raw_dir: null
+
+checkpoint:
+  reset_optimizer: False
+  strict: True

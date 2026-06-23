@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Env / tooling
+.venv/
+venv/
+.python-version
+*.pth.tmp
+
+# Data / artifacts (never commit)
+data/
+outputs/
+logs/
+*.log
+wandb/
+*.ckpt
+*.pt
+*.pth
+*.mp4
+*.zarr/
+*.h5
+*.hdf5
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+
+# debug sweep scratch
+_sweep_out/
+_sweep_mimicgen.sh
+outputs/
+slurm_logs/

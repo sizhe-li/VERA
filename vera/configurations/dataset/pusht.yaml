@@ -1,0 +1,47 @@
+defaults:
+  - base_dataset_with_algo
+
+name: pusht
+robot_name: pusher
+dataset_type: standard
+sample_mode: standard
+# Per-embodiment IDM action model (vera/datasets/core/actions.py): pos-command delta
+# — matches okto PushTPosCmdDeltaAction. NOTE: PushT actions live in the zarr, NOT the
+# packed NPZ, so this model needs a PushtZarr loader (cfg.pusht_zarr_root); the packed
+# core loader does not yet provide one, so the IDM du path for pusht is not wired end-
+# to-end (the class is implemented + unit-tested for parity against okto).
+action_mode: pusht_pos_cmd
+qpos_indices: [0, 1]
+action_scale: 1.0
+# Override root/pusht_zarr_root via CLI or use pusht_packed.yaml / pusht_srg1.yaml
+root: ???
+pusht_zarr_root: ???
+overfit_idx: null
+context_frames: 2
+future_frames: 3
+action_chunk_horizon: 3
+window_length: 5
+
+sampling:
+  num_frames: ${dataset.window_length}
+  linearize_time_length: 1
+
+camera:
+  views: ["00"]
+  image_size: [252, 252]
+
+load_motion_tracks: true
+
+# Algorithm-facing (motion policy / video)
+save_dir: data/pusht_placeholder
+max_frames: ${dataset.window_length}
+context_length: ${dataset.context_frames}
+resolution: 252
+observation_shape: [5, "${dataset.resolution}", "${dataset.resolution}"]
+data_mean: [[[0.0]], [[0.0]], [[0.0]], [[0.0]], [[0.0]]]
+data_std: [[[1.0]], [[1.0]], [[1.0]], [[1.0]], [[1.0]]]
+
+# Action normalization (standard pusht)
+action_mean: [-0.0014940203400328755, 0.0011664340272545815]
+action_std: [0.033660080283880234, 0.03374255448579788]
+oflow_std: [0.45176470279693604, 0.45381349325180054]

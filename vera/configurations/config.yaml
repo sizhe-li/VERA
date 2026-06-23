@@ -1,0 +1,19 @@
+# configuration parsing starts here
+defaults:
+  - experiment: jacobian_learning # experiment yaml file name in configurations/experiments folder [fixme]
+  - dataset: action_iiwa # dataset yaml; prefer new names (e.g. pusht_noise_engaging, iiwa_engaging). See configurations/dataset/README_MIGRATION.md
+  - optional validation_dataset: null
+  - algorithm: image_jacobian # algorithm yaml file name in configurations/algorithm folder [fixme]
+  - optional dataset_experiment: ${dataset}_${experiment} # optional yaml file in configurations/dataset_experiment folder, overrides algorithm and experiment configurations that are dataset and experiment dependent
+  - cluster: null # optional, cluster yaml file name in configurations/cluster folder. Leave null for local compute
+
+name: null
+debug: false # global debug flag will be passed into configuration of experiment, dataset and algorithm
+
+wandb:
+  entity: your-wandb-entity # wandb account name / organization name [fixme]
+  project: jacobian-learning # wandb project name; if not provided, defaults to root folder name [fixme]
+  mode: online # set wandb logging to online, offline or dryrun
+
+resume: null # wandb run id to resume logging and loading checkpoint from
+load: null # wanmdb run id containing checkpoint or a path to a checkpoint file

@@ -1,0 +1,71 @@
+defaults:
+  - config
+  - override /experiment: jacobian_learning
+  - override /dataset: pusht_packed
+  - override /algorithm: image_jacobian
+  - override /algorithm/model: pusht_vggt_fusion_uv
+  - _self_
+
+name: pusht_vggt_fusion_uv_jacobian
+
+wandb:
+  project: idm-ablations
+  group: idm-ablations
+  tags: [idm-ablations, pusht, jacobian, dpt-vggt-fusion]
+
+experiment:
+  tasks: [training]
+  training:
+    batch_size: 64
+    lr: 1e-4
+    max_steps: 200000
+    log_every_n_steps: 10
+    enable_progress_bar: true
+    progress_bar_refresh_rate: 1
+    optim:
+      accumulate_grad_batches: 1
+    data:
+      num_workers: 16
+      pin_memory: true
+      prefetch_factor: 4
+      persistent_workers: true
+  validation:
+    batch_size: 64
+    shuffle: true
+    val_every_n_step: 2000
+    num_sanity_val_steps: 1
+    limit_batch: 1
+    data:
+      num_workers: 4
+      pin_memory: true
+      prefetch_factor: 2
+      persistent_workers: true
+  find_unused_parameters: true
+
+dataset:
+  context_frames: 1
+  future_frames: 1
+  action_chunk_horizon: 1
+  window_length: 2
+  sampling:
+    num_frames: 2
+    linearize_time_length: 1
+  load_motion_tracks: false
+
+algorithm:
+  supervision: flow
+  inverse_action_weight: 0.0
+  flow_loss: mse
+  logging:
+    loss_freq: 10
+    max_validation_batches: 1
+    max_validation_samples: 4
+    max_validation_views: 1
+    max_num_videos: 4
+    max_validation_frames: 2
+
+hydra:
+  run:
+    dir: ${oc.env:VERA_DATA_PREFIX,/path/to/data}/datasets/jacobian/wandb_runs/idm-ablations/${now:%Y-%m-%d}/${now:%H-%M-%S}_${name}
+  sweep:
+    dir: ${oc.env:VERA_DATA_PREFIX,/path/to/data}/datasets/jacobian/wandb_runs/idm-ablations/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}

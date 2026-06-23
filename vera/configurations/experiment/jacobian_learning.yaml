@@ -1,0 +1,70 @@
+# Important: Be careful when modifying this file!
+# The fields in file will be overridden by the dataset dependent config file in the `configurations/dataset_experiment` folder so consider making changes there instead!
+
+defaults:
+  - base_pytorch_exp
+
+tasks: [training]
+
+ema:
+  enable: False
+
+training:
+  lr: 5e-4
+  precision: 16-mixed
+  batch_size: 16
+  max_steps: -1
+  max_epochs: 32
+  # For debugging validation/vis: override with experiment.training.max_steps=2 experiment.validation.val_every_n_step=1
+  data:
+    num_workers: 8
+    shuffle: True
+    pin_memory: True
+    prefetch_factor: 2
+    persistent_workers: True
+    cache:
+      video: 8
+      zarr: 8
+      droid_h5: 16
+  checkpointing:
+    every_n_train_steps: 5000
+    every_n_epochs: null
+  optim:
+    gradient_clip_val: 1.0
+  # Finetuning: set override_optim_state: true to use config lr and step 0 when loading a checkpoint
+  override_optim_state: False
+  override_strict_load: False
+
+validation:
+  batch_size: 1
+  val_every_n_step: 5000
+  val_every_n_epoch: null
+  num_sanity_val_steps: 0
+  limit_batch: 1  # Keep validation lightweight; visualization is capped in algorithm config.
+  data:
+    num_workers: 2
+    shuffle: False
+    pin_memory: True
+    prefetch_factor: 2
+    persistent_workers: True
+    cache:
+      video: 8
+      zarr: 8
+      droid_h5: 16
+
+test:
+  batch_size: 8
+  limit_batch: 1.0
+  data:
+    num_workers: 2
+    shuffle: False
+    pin_memory: True
+    prefetch_factor: 2
+    persistent_workers: True
+    cache:
+      video: 8
+      zarr: 8
+      droid_h5: 16
+reload_dataloaders_every_n_epochs: 0
+
+find_unused_parameters: False

@@ -1,0 +1,105 @@
+# Combined 4-environment mixture for the cross-embodiment WAN/OMNI retrain.
+# Self-contained port of flow-planner configurations/dataset/combined_4env.yaml.
+# Consumed by vera.datasets.mixture.MixtureDataset (NO import flow_planner / okto).
+#
+# Each subset keeps its NATIVE (fps, width, per-view aspect, pad_views_to); the
+# mixture black-pads each post-tile frame to a common canvas (pad_to_width=576) so
+# every batch element is [T=37, 3, 128, 576]. Per-subset filled / black extents:
+#   DROID 576/0 · Allegro_sim 384/192 · Allegro_real 256/320 · MimicGen 256/320.
+#
+# Subset cfgs are inlined under `subset/<name>` (vera registry reads flow-planner
+# field names directly). MixtureDataset forwards outer fields to each subset EXCEPT
+# those in `propagate_skip` (width, pad_views_to) so per-subset native sizing holds.
+
+# --- uniform (propagated) fields ---
+name: combined_4env
+n_frames: 37
+height: 128
+max_text_tokens: 512
+image_to_video: true
+load_optical_flow: false
+pad_to_width: 576
+
+# Outer width = canvas for the algorithm (wan_t2v lat_w). NOT propagated (each subset
+# keeps native width for per_view_w = width // n_views).
+width: 576
+pad_views_to: 3
+propagate_skip: [width, pad_views_to]
+fps: null            # not propagated as None; each subset keeps native fps.
+
+debug: false
+
+subset/allegro_sim:
+  name: allegro_sim
+  layout: tiled
+  data_root: /path/to/data/kitti/allegro_sim/
+  metadata_path: /path/to/flow-planner/datasets/allegro_apptainer_directional.csv
+  height: 128
+  width: 384
+  n_frames: 37
+  fps: 10
+  concat_views: ["camera_0_rgb", "camera_1_rgb", "camera_2_rgb"]
+  trim_mode: random_cut
+  pad_mode: pad_last
+  load_optical_flow: false
+  pad_to_width: 576
+  download: {override_fps: 10, views: ["camera_0_rgb", "camera_1_rgb", "camera_2_rgb"]}
+
+subset/allegro_real:
+  name: allegro_real
+  layout: tiled
+  data_root: /path/to/data/jacobian/allegro_real_v2
+  metadata_path: /path/to/flow-planner/datasets/allegro_real_v2_metadata.csv
+  height: 128
+  width: 256
+  n_frames: 37
+  fps: 10
+  concat_views: ["211122063441_rgb", "211522062345_rgb"]
+  trim_mode: random_cut
+  pad_mode: pad_last
+  load_optical_flow: false
+  pad_to_width: 576
+  download: {override_fps: 50, views: ["211122063441_rgb", "211522062345_rgb"]}
+
+subset/mimicgen:
+  name: mimicgen
+  layout: tiled
+  data_root: /path/to/data/kitti/mimicgen_datasets_rendered_compressed/core
+  metadata_path: /path/to/flow-planner/datasets/mimicgen_all_dualview_metadata.csv
+  height: 128
+  width: 256
+  n_frames: 37
+  fps: 10
+  concat_views: ["agentview_image_rgb", "robot0_eye_in_hand_image_rgb"]
+  trim_mode: random_cut
+  pad_mode: pad_last
+  load_optical_flow: false
+  pad_to_width: 576
+  download: {override_fps: 10, views: ["agentview_image_rgb", "robot0_eye_in_hand_image_rgb"]}
+
+subset/droid_flow:
+  name: droid_flow
+  layout: tiled
+  data_root: /path/to/data/acid/droid_raw/1.0.1
+  metadata_path: metadata_droid_raw_mv_cleaned_captioned.csv
+  height: 128
+  width: 576
+  n_frames: 37
+  fps: 30
+  temporal_stride: 2
+  concat_views: ["ext1", "ext2", "wrist"]
+  pad_views_to: 3
+  trim_mode: random_cut
+  pad_mode: pad_last
+  load_optical_flow: false
+  pad_to_width: 576
+  download: {override_fps: 60, views: ["ext1", "ext2", "wrist"]}
+
+# --- episode-balanced absolute weighting (no ×len) ---
+training:
+  weight_type: absolute
+  weight: {allegro_sim: 1.0, allegro_real: 1.0, mimicgen: 1.0, droid_flow: 1.0}
+
+validation:
+  weight_type: absolute
+  weight: {allegro_sim: 1.0, allegro_real: 1.0, mimicgen: 1.0, droid_flow: 1.0}

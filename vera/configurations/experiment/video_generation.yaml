@@ -1,0 +1,68 @@
+# Video-generation (WAN / OMNI) training experiment.
+# Consumed by vera.experiments.video_generation.VideoGenerationExperiment.
+# Mirrors flow-planner configurations/experiment/exp_video.yaml (bf16, bs=1, grad-accum,
+# step-based checkpointing) but inherits vera's base_pytorch_exp scaffolding.
+
+defaults:
+  - base_pytorch_exp
+
+tasks: [training]
+
+num_nodes: 1
+strategy: auto        # auto | ddp | fsdp (fsdp recommended for multi-GPU 14B)
+find_unused_parameters: False
+reload_dataloaders_every_n_epochs: 0
+
+ema:
+  enable: False        # WAN manages its own (no-EMA) optimizer; base EMA deep-copies 14B params.
+  decay: 0.9999
+  validate_original_weights: False
+
+training:
+  lr: 6.0e-06          # OMNI finetune lr (matches exported algo_config.yaml).
+  precision: bf16-mixed
+  compile: False
+  batch_size: 1
+  max_epochs: -1
+  max_steps: 10000000
+  log_every_n_steps: 1
+  enable_progress_bar: True
+  progress_bar_refresh_rate: 1
+  override_optim_state: False
+  data:
+    num_workers: 4     # video decode is CPU-heavy; raise for full runs.
+    shuffle: False     # MixtureDataset is an IterableDataset (shuffles internally).
+    persistent_workers: True
+  optim:
+    accumulate_grad_batches: 4
+    gradient_clip_val: 0   # 0 disables; flow-planner used null (no clip).
+  checkpointing:
+    every_n_train_steps: 2000
+    every_n_epochs: null
+    save_weights_only: False
+    filename: "{step}"
+    save_top_k: 1
+    save_last: True
+
+validation:
+  precision: bf16-mixed
+  compile: False
+  batch_size: 1
+  val_every_n_step: 1000
+  val_every_n_epoch: null
+  num_sanity_val_steps: 0    # skip sanity val; WAN validation = expensive AR rollout.
+  limit_batch: 1
+  inference_mode: True
+  data:
+    num_workers: 1
+    shuffle: False
+
+test:
+  precision: bf16-mixed
+  compile: False
+  batch_size: 1
+  limit_batch: 1
+  inference_mode: True
+  data:
+    num_workers: 1
+    shuffle: False

@@ -1,0 +1,102 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vera"
+version = "0.0.1"
+description = "VERA — video-planner + Jacobian inverse-dynamics manipulation system (unified public release)"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Sizhe Lester Li" },
+]
+# Core deps shared by the unified dataset/config layer (import-light). The heavy
+# training/inference stacks are in the `video` / `idm` extras. Consolidated from
+# third_party/flow-planner/requirements.txt and project/okto requirements.
+dependencies = [
+    "numpy>=1.24",
+    "torch==2.6.0",  # pinned: flash-attn wheels are ABI-tied to the torch build
+    "omegaconf>=2.3",
+    "hydra-core>=1.3",
+    "einops",
+    "pyyaml",
+    # Imported at module scope by vera.{policy,idm,server} — without these a plain
+    # `pip install -e .` cannot `import vera.policy / vera.idm / vera.server`.
+    "jaxtyping",      # vera-wide tensor typing (18 modules)
+    "dacite",         # dataclass config hydration
+    "huggingface-hub",  # checkpoint download path (ckpt_utils)
+    "websockets",     # policy serving protocol
+    "msgpack",        # policy serving protocol
+    "timm",           # IDM/VGGT backbone layers
+    "wandb",          # ckpt_utils does a module-top `import wandb`; core import chain needs it
+    "pillow",         # PIL — datasets/server/utils/env_runner image handling
+    "requests",       # http downloads (idm + video_model)
+    "roma",           # rotation math (utils)
+    "torchmetrics",   # metrics (utils + idm)
+    "wandb-osh",      # offline wandb sync hook (utils + video_model)
+    "plotly",         # diagnostic plotting (utils)
+    "easydict",       # attr-dict configs (idm + video_model)
+]
+
+[project.optional-dependencies]
+# Video planner (WAN) side — from flow-planner/requirements.txt.
+video = [
+    "torchvision",
+    "pytorch-lightning>=2.5",
+    "lightning>=2.5",
+    "transformers>=4.51",
+    "diffusers>=0.34",
+    "accelerate>=1.1",
+    "deepspeed>=0.15",
+    "wandb",
+    "opencv-python",
+    "decord",
+    "imageio",
+    "imageio-ffmpeg",
+    "av",
+    "zarr>=3.0",
+    "pandas",
+    "scikit-learn",
+    "regex",                  # WAN tokenizer / text processing (video_model)
+]
+# Jacobian IDM side — from okto requirements.
+idm = [
+    "scipy",
+    "transforms3d",
+    "h5py",
+    "zarr>=3.0",
+    "mediapy",
+    "moviepy",
+    "pytorchvideo",
+    "rerun-sdk",
+    "tqdm",
+    "matplotlib",
+    "wandb",
+    "openai-clip",            # CLIP image encoder (idm backbones; import name `clip`)
+    "lightning-utilities",    # lightning helpers (idm)
+    "rotary-embedding-torch", # rotary positional embeddings (idm)
+    # VGGT visual backbone for the Jacobian IDM (both MimicGen + PushT). Public repo,
+    # pip-installable; pulls the VGGT-1B weights from facebook/VGGT-1B on first use.
+    "vggt @ git+https://github.com/facebookresearch/vggt.git",
+]
+# Sim environments for the example notebooks + eval (MimicGen / PushT). robomimic/robosuite/mimicgen
+# carry their own MuJoCo assets, which is why they are an extra rather than core.
+eval = [
+    "gymnasium==0.29.1",
+    "gym-pusht==0.1.5",
+    "robomimic==0.5.0",
+    "robosuite==1.4.1",
+    "mimicgen==1.0.0",
+    "mujoco==3.5.0",
+    "imageio",
+]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+include = ["vera*"]
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow / data-backed (deselect with '-m \"not slow\"')",
+]

@@ -1,0 +1,22 @@
+defaults:
+- pusht
+root: ${oc.env:VERA_DATA_PREFIX,/path/to/data}/datasets/jacobian/pusht_packed
+state_q_min:
+- 13.45642375946045
+- 32.93829345703125
+state_q_max:
+- 496.14617919921875
+- 510.9578857421875
+load_motion_tracks: false
+action_normalization_mode: symmetric_percentile
+action_percentile: 90.0
+action_abs_scale:
+- 0.05494181513786317
+- 0.05669689774513245
+flow_normalization_space: raw_fullres
+flow_normalization_mode: symmetric_percentile
+oflow_scale: null
+oflow_percentile: 90.0
+oflow_abs_scale:  # active-pixel p90 (mag>0.1px), fixes static-bg-dominated scale
+- 1.1350075006484985
+- 1.0981006622314453

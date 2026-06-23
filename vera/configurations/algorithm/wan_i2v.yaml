@@ -1,0 +1,66 @@
+# WAN image-to-video training algorithm config — the OMNI 14B I2V (N=6, M=4)
+# cross-embodiment model. Self-contained vera port mirroring the exported OMNI
+# algo_config.yaml at
+#   /path/to/data/jacobian/exported/omni_combined_4env_step9000/
+#
+# Consumed by vera.video_model.algorithms.wan.wan_i2v.WanImageToVideo. Inherits
+# wan_t2v.yaml and overrides everything that differs for the 14B I2V finetune:
+# clip conditioning, in_dim=36, dim/ffn/heads/layers, N=6, and the I2V ckpt paths.
+
+defaults:
+  - wan_t2v
+  - _self_
+
+name: wan_i2v
+
+# OMNI finetune lr (exported algo_config.yaml).
+lr: ${experiment.training.lr}
+
+# 3 tiled camera views per frame (combined_4env canvas = 3*192 = 576).
+vae_num_views: 3
+
+diffusion_forcing:
+  enabled: true
+  mode: rand_history
+  clean_hist_prob: 0.8        # OMNI used 0.8
+  M: 4
+  N: 6                        # OMNI context window = 6 latent frames
+  training_context_latents: [1, 2, 3, 4]
+  validation_vis_context_latents: [1, 2, 3, 4]
+  validation_n_frames: 200
+  validation_ar_steps: 1
+
+gradient_checkpointing_rate: 0.5
+
+# --- I2V text encoder / VAE / CLIP from the Wan2.1-I2V-14B-480P base ---
+text_encoder:
+  ckpt_path: /path/to/flow-planner/data/ckpts/Wan2.1-I2V-14B-480P/models_t5_umt5-xxl-enc-bf16.pth
+
+vae:
+  ckpt_path: /path/to/flow-planner/data/ckpts/Wan2.1-I2V-14B-480P/Wan2.1_VAE.pth
+
+clip:
+  ckpt_path: /path/to/flow-planner/data/ckpts/Wan2.1-I2V-14B-480P/models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth
+  compile: false
+
+# --- 14B I2V DiT ---
+# model.ckpt_path provides config.json for the architecture; tuned_ckpt_path is the
+# exported OMNI step-9000 weights (finetune init). The algo builds WanModel on meta
+# from config.json then load_state_dict(_load_tuned_state_dict()).
+model:
+  ckpt_path: /path/to/flow-planner/data/ckpts/Wan2.1-I2V-14B-480P
+  tuned_ckpt_path: /path/to/data/jacobian/exported/omni_combined_4env_step9000/video_model.ckpt
+  compile: false
+  model_type: i2v             # i2v => model takes CLIP features + image-condition channels
+  patch_size: [1, 2, 2]
+  in_dim: 36                  # 16 (z) + 4 (mask) + 16 (image latent) for I2V
+  dim: 5120
+  ffn_dim: 13824
+  freq_dim: 256
+  out_dim: 16
+  num_heads: 40
+  num_layers: 40
+  window_size: [-1, -1]
+  qk_norm: True
+  cross_attn_norm: True
+  eps: 1e-6
