@@ -137,8 +137,7 @@ python -m vera.server.start_vera_server --embodiment mimicgen --port 8800 --vis-
 > Set **both** env vars before launching — the hosted `algo_config.yaml` reads the DiT + flow decoder from
 > `VERA_MIMICGEN_CKPT_DIR` and the Wan2.1 base from `VERA_WAN_CKPT_ROOT`.
 
-**2. Run the client:** open **`examples/mimicgen_stack.ipynb`** → **Run All** (defaults to a known-good
-`stack_d0` initial state).
+**2. Run the client:** open **`examples/mimicgen_stack.ipynb`** → **Run All**.
 
 - swap pieces live via env vars on the server: `VERA_DYNAMICS_RUN_ID` (IDM checkpoint),
   `VERA_TRACKER_BACKEND`, `VERA_MOTION_PLAN_SCALE`, `VERA_N_ACTION_STEPS`.
