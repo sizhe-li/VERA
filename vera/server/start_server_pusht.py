@@ -35,11 +35,11 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname
 #   IDM     = Jacobian (j1j59qzz): model.ckpt + config.yaml sidecar.
 DEFAULT_PLANNER_CKPT = os.environ.get(
     "VERA_PUSHT_PLANNER_CKPT",
-    "/path/to/data/jacobian/pusht_run_checkpoints/lester0866/jacobian/dvxixf6d/model.ckpt",
+    "/path/to/data/jacobian/pusht_run_checkpoints/your-wandb-entity/jacobian/dvxixf6d/model.ckpt",
 )
 DEFAULT_DYNAMICS_CKPT = os.environ.get(
     "VERA_PUSHT_DYNAMICS_CKPT",
-    "/path/to/data/jacobian/pusht_run_checkpoints/lester0866/jacobian/j1j59qzz/model.ckpt",
+    "/path/to/data/jacobian/pusht_run_checkpoints/your-wandb-entity/jacobian/j1j59qzz/model.ckpt",
 )
 
 # adapter_factory references mod.DEFAULT_DYNAMICS_RUN_ID for the idm_model handshake label.

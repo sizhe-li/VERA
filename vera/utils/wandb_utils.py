@@ -494,7 +494,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     cleanup_project(
-        "scene-representation-group",
+        "your-wandb-entity",
         "video_diffusion",
         "wandb_cleanup",
         ignore_ttl=args.ignore_ttl,

@@ -21,7 +21,7 @@ Usage (cluster):
 
 To connect from the hand-host:
     # SSH tunnel (recommended):
-    ssh -N -L 8767:localhost:8767 sizheli@cluster
+    ssh -N -L 8767:localhost:8767 user@cluster
     python -m tasks_diffusion_policy.neural_jacobian.allegro.scripts.examples.allegro_ws_runner --host localhost --port 8767
 """
 

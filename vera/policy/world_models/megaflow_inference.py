@@ -81,8 +81,7 @@ class MegaFlowInference:
             raise RuntimeError(
                 "megaflow tracker backend selected but the `megaflow` package is "
                 "not importable. Install with:\n"
-                "    pip install -e /path/to/"
-                "whole-body-jacobian/third_party/megaflow --ignore-requires-python"
+                "    pip install -e /path/to/megaflow --ignore-requires-python"
             ) from exc
         model = MegaFlow.from_pretrained(self.config.model_name, device=str(self.device))
         for parameter in model.parameters():
