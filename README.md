@@ -39,14 +39,17 @@ translate that dream into actions:
 
 ## 🗺️ Release roadmap
 
+_Last updated: **Jul 4, 2026**._
+
 | Wave | Embodiments | Code | Checkpoints | Status |
 |------|-------------|:----:|:-----------:|:------:|
-| **Wave 1 — now** | **MimicGen** (Panda, 2-block stacking) · **PushT** (planar pusher) | ✅ | ✅ | **early version available** (working on bug fixes from merging the two repos) |
-| **Wave 2 — later this week** | Allegro-Sim · Allegro-Real · IIWA-Sim · DROID (FR3 real) | ✅ in-tree | 🔜 | code present; checkpoints + docs coming |
+| **Wave 1** — released Jun 23, 2026 | **MimicGen** (Panda, 2-block stacking) · **PushT** (planar pusher) | ✅ | ✅ | **early version available** (as of Jul 4: working on bug fixes from merging the two repos) |
+| **Wave 2** — ETA ~Jul 11, 2026 | Allegro-Sim · Allegro-Real · IIWA-Sim · DROID (FR3 real) | ✅ in-tree | 🔜 | code present; checkpoints + docs coming |
 
 This repo already contains the unified code for **all** embodiments, but Wave 1 documents and ships
 checkpoints only for **MimicGen + PushT**. The cross-embodiment **OMNI** WAN planner and the DROID/Allegro
-IDMs land with Wave 2.
+IDMs land with Wave 2. We are also working on releasing the **Allegro-hand and IIWA simulators** themselves
+(as of Jul 4, 2026 — the `eval` extra currently covers only the MimicGen + PushT environments).
 
 ---
 
