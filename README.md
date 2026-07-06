@@ -183,7 +183,6 @@ frozen upstream pieces are pulled from their original homes.
 | Group | dir | what |
 |---|---|---|
 | **MimicGen** | `mimicgen-wan-1.3b/` | specialist WAN planner (DiT-only bf16, ~2.8 GB) + `flow_decoder.ckpt` + `algo_config.yaml` |
-| | `idm-mimicgen-37oa162u/` | MimicGen Jacobian IDM (+ config sidecar) |
 | **PushT** | `pusht-dfot/` | DFoT flow planner (~39 MB) + `run_config.yaml` |
 | | `pusht-idm/` | PushT Jacobian IDM (~232 MB) + `config.yaml` |
 | **Upstream** | `Wan-AI/Wan2.1-T2V-1.3B`, `facebook/VGGT-1B` | WAN base + IDM backbone (not re-hosted) |
@@ -193,7 +192,6 @@ frozen upstream pieces are pulled from their original homes.
 ```bash
 # (1) MimicGen + PushT only — IDM + video planner for the Wave-1 notebooks   (~15 GB)
 hf download sizhe-lester-li/VERA --local-dir ./vera-ckpts \
-    --include "mimicgen-wan-1.3b/*" "idm-mimicgen-285ouq1q/*" "idm-mimicgen-37oa162u/*" "pusht-dfot/*" "pusht-idm/*"
 
 # (2) everything — also pulls the 33 GB OMNI planner + DROID IDM (Wave 2)      (~42 GB)
 hf download sizhe-lester-li/VERA --local-dir ./vera-ckpts
