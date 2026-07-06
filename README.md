@@ -27,13 +27,8 @@ policy. It leaves a video generative model **as-is** as an action-free world mod
 and trains an embodiment-specific **inverse-dynamics model (IDM)** — built on the robot's **Jacobian** — to
 translate that dream into actions:
 
-1. **Video planner** (`vera.video_model` / `vera.idm.dfot`) — an action-free diffusion model that generates
-   future frames from the current observation (+ optional text). **Embodiment-agnostic.**
-2. **Jacobian IDM** (`vera.idm` + `vera.policy`) — a faithful, data-efficient translator from dreamed future
-   to robot actions. **Embodiment-specific**, swappable without retraining the planner.
-
-> The thesis: *decoupled video planning + faithful video-to-action translation* is a viable route to
-> zero-shot, cross-embodiment robot control. **One video planner, many IDMs.**
+1. **Video planner** (`vera.video_model` / `vera.idm.dfot`)
+2. **Jacobian IDM** (`vera.idm` + `vera.policy`)
 
 ---
 
