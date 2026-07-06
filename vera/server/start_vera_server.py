@@ -15,7 +15,7 @@ the near-lossless threshold), and serves it over the websocket transport.
         --algo-config /path/to/omni/algo_config.yaml --text "pick up the red block"
 
 Speedups (measured: docs/SPEEDUP_REPORT.md). flash_attn is a property of the conda env (use
-sizheli-okto). DiT teacache is enabled here by default at rel_l1_thresh=0.10 — the near-lossless
+the serving env). DiT teacache is enabled here by default at rel_l1_thresh=0.10 — the near-lossless
 operating point (~1.4x, PSNR 46 / LPIPS 0.09). DO NOT raise much past 0.15 (quality cliff).
 """
 from __future__ import annotations
