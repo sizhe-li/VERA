@@ -33,7 +33,7 @@ dependencies = [
     "pillow",         # PIL — datasets/server/utils/env_runner image handling
     "requests",       # http downloads (idm + video_model)
     "roma",           # rotation math (utils)
-    "torchmetrics",   # metrics (utils + idm)
+    "torchmetrics==1.4.0.post0",  # metrics (utils + idm); version matches the tested environment
     "torch-fidelity", # torchmetrics' FID module imports it at module scope
     "colorama",       # vera.utils.{logging,print_utils} import it at module scope
     "mediapy",        # video IO — vera.policy.motion_policy_allegro + env_runner import it at module scope
@@ -49,7 +49,7 @@ video = [
     "torchvision",
     "pytorch-lightning>=2.5",
     "lightning>=2.5",
-    "transformers>=4.51,<5",  # v5 breaks the WAN text-encoder loading path
+    "transformers>=4.51",     # WAN text encoder; loads under both 4.51+ and 5.x releases
     "diffusers>=0.34",
     "accelerate>=1.1",
     "deepspeed>=0.15",

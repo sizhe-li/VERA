@@ -174,6 +174,15 @@ def make_adapter(
         **build_kwargs,
     )
 
+    # Chunk-commit size: the adapter's per-call default must not exceed the policy's own
+    # per-plan commit budget (cfg.n_action_steps), or the two disagree on how many actions a
+    # client plays between replans. The configure path already moves them together
+    # (websocket_policy_server._sync_action_horizon); apply the same rule at build time so a
+    # freshly launched server serves the builder's configured commit size.
+    policy_n_action_steps = getattr(getattr(policy, "cfg", None), "n_action_steps", None)
+    if policy_n_action_steps:
+        action_horizon = max(1, min(int(action_horizon), int(policy_n_action_steps)))
+
     # Advertise the IDM the module actually resolved: modules that define a local-checkpoint
     # default (DEFAULT_DYNAMICS_CKPT) load it directly when the file exists, so label the
     # handshake with that checkpoint's bundle directory name instead of a run id.

@@ -123,7 +123,9 @@ python -m vera.server.start_vera_server --embodiment pusht --port 8820 --vis-por
 - it connects to the server, rolls out the walkthrough's default start state (a single episode — set
   `FRAME_INDICES = None` in the notebook for a population success rate), prints the result, and inlines
   the rollout + the composite policy-vis;
-- checkpoint paths come from the `VERA_PUSHT_*` env vars (see `vera/server/start_server_pusht.py`).
+- checkpoint paths come from the `VERA_PUSHT_*` env vars (see `vera/server/start_server_pusht.py`);
+- the server plans 3 future frames per replan and executes 2 of them (`VERA_PUSHT_ACTION_CHUNK_HORIZON=3`,
+  `VERA_PUSHT_N_ACTION_STEPS=2`, both env-overridable).
 
 ### MimicGen two-block stacking (WAN planner)
 

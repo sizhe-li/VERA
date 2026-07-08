@@ -2,7 +2,8 @@
 
 This is the SERVER side of the PushT client-server path. It constructs the two-stage policy
 served to examples/pusht_dfot_stack.ipynb: a DFoT motion planner + a Jacobian inverse-dynamics
-model, with the PushT parameters (motion_plan_scale=30, action_scale=8, lam=5, chunk/exec=3).
+model, with the PushT parameters (motion_plan_scale=30, action_scale=8, lam=5, plan horizon 3
+with 2 executed steps per replan).
 Both checkpoints are LOCAL files with config sidecars next to them — no wandb access at runtime,
 no WAN prefix patch (DFoT needs none). The policy is the gripperless base ``MotionPolicy``
 (single view, 2D position-delta du).
@@ -53,8 +54,10 @@ ACTION_SCALE = float(os.environ.get("VERA_PUSHT_ACTION_SCALE", "8.0"))
 LAM = float(os.environ.get("VERA_PUSHT_LAM", "5.0"))
 CLIP_DU = float(os.environ.get("VERA_PUSHT_CLIP_DU", "10000.0"))
 SMOOTHING = float(os.environ.get("VERA_PUSHT_SMOOTHING", "0.0"))
+# Plan/commit split: the planner predicts ACTION_CHUNK_HORIZON future frames per replan and
+# N_ACTION_STEPS of them are executed before the next replan (adapter chunk size follows it).
 ACTION_CHUNK_HORIZON = int(os.environ.get("VERA_PUSHT_ACTION_CHUNK_HORIZON", "3"))
-N_ACTION_STEPS = int(os.environ.get("VERA_PUSHT_N_ACTION_STEPS", "3"))
+N_ACTION_STEPS = int(os.environ.get("VERA_PUSHT_N_ACTION_STEPS", "2"))
 DEFAULT_PLANNER_STEPS = int(os.environ.get("VERA_PUSHT_PLANNER_STEPS", "100"))
 
 

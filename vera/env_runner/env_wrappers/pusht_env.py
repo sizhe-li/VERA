@@ -35,10 +35,11 @@ from gym_pusht.envs.pusht import PushTEnv
 from gymnasium import spaces
 from pymunk.vec2d import Vec2d
 
-try:  # pymunk's pygame DrawOptions import path, matching upstream usage
-    from pymunk.pygame_util import DrawOptions
-except ImportError:  # pragma: no cover
-    DrawOptions = pymunk.pygame_util.DrawOptions
+# Use gym-pusht's bundled draw options (the renderer upstream PushTEnv itself
+# uses) rather than pymunk's stock ``pygame_util.DrawOptions``. The two shade
+# shapes differently, and the released PushT planner/IDM checkpoints were
+# trained on frames rendered by the bundled version.
+from gym_pusht.envs.pymunk_override import DrawOptions
 
 _BACKGROUND_PNG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "light-gray-floor.png")
 
