@@ -38,3 +38,5 @@ _sweep_out/
 _sweep_mimicgen.sh
 outputs/
 slurm_logs/
+examples/droid_demo_videos/
+examples/outputs/

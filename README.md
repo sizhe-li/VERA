@@ -34,12 +34,13 @@ translate that dream into actions:
 
 ## 🗺️ Release roadmap
 
-_Last updated: **Jul 6, 2026**._
+_Last updated: **Jul 12, 2026**._
 
 | Wave | Embodiments | Code | Checkpoints | Status |
 |------|-------------|:----:|:-----------:|:------:|
 | **Wave 1** — released Jun 23, 2026 | **MimicGen** (Panda, 2-block stacking) · **PushT** (planar pusher) | ✅ | ✅ | **ready** |
-| **Wave 2** — ETA ~Jul 11, 2026 | Allegro-Sim · Allegro-Real · IIWA-Sim · DROID (FR3 real) | ✅ | 🔜 | code present; checkpoints + docs coming |
+| **Wave 2a** — Jul 12, 2026 | **DROID video generation** (WAN planner + walkthrough notebook) | ✅ | ✅ | **ready** |
+| **Wave 2b** | Allegro-Sim · Allegro-Real · IIWA-Sim · DROID policy serving (FR3 real) | ✅ | 🔜 | code present; checkpoints + docs coming |
 
 This repo already contains the unified code for **all** embodiments, but Wave 1 documents and ships
 checkpoints only for **MimicGen + PushT**. The cross-embodiment **OMNI** WAN planner and the DROID/Allegro
@@ -111,6 +112,7 @@ notebook in another. The notebook drives the sim, prints the success rate, and i
 |---|---|---|
 | **PushT** — planar push-to-goal | `--embodiment pusht` | **`examples/pusht_dfot_stack.ipynb`** |
 | **MimicGen** — 2-block stacking | `--embodiment mimicgen` | **`examples/mimicgen_stack.ipynb`** |
+| **DROID** — video generation from language | *(no server needed)* | **`examples/droid_generation.ipynb`** |
 
 ### PushT (DFoT planner — small, loads in seconds)
 
@@ -147,6 +149,26 @@ python -m vera.server.start_vera_server --embodiment mimicgen --port 8800 --vis-
 - swap pieces live via env vars on the server: `VERA_DYNAMICS_RUN_ID` (IDM checkpoint),
   `VERA_TRACKER_BACKEND`, `VERA_MOTION_PLAN_SCALE`, `VERA_N_ACTION_STEPS`.
 
+### DROID — language-conditioned video generation (no robot required)
+
+If you want to see the planner itself at work before setting up any simulator, start here: the
+notebook continues the same real context frames under different language prompts, and the
+generated futures differ accordingly (the executed outputs ship in the notebook, so you can
+inspect them before running anything). It runs the DROID WAN planner directly — single GPU,
+~60 GB VRAM (bf16); no server, no sim.
+
+**1. Point at the downloaded checkpoints:**
+```bash
+export VERA_DROID_CKPT_DIR=./vera-ckpts/wan-droid-14b       # DROID WAN planner (DiT + algo_config.yaml)
+export VERA_WAN14B_CKPT_ROOT=/path/to/Wan2.1-I2V-14B-480P   # frozen Wan2.1 base (text-enc + VAE + CLIP)
+```
+**2. Run the notebook:** open **`examples/droid_generation.ipynb`** → **Run All**.
+
+- two experiments on the bundled sample clips (`examples/droid_demo_videos/`, three synchronized
+  DROID cameras): the same prompt from five start times, and three different prompts from the same
+  start frame (context frames red-bordered, generation follows);
+- context length and guidance come from the checkpoint's `algo_config.yaml`.
+
 ---
 
 ## Live viewer — watch the policy think
@@ -182,7 +204,9 @@ frozen upstream pieces are pulled from their original homes.
 | **MimicGen** | `mimicgen-wan-1.3b/` | specialist WAN planner (DiT-only bf16, ~2.8 GB) + `flow_decoder.ckpt` + `algo_config.yaml` |
 | **PushT** | `pusht-dfot/` | DFoT flow planner (~39 MB) + `run_config.yaml` |
 | | `pusht-idm/` | PushT Jacobian IDM (~232 MB) + `config.yaml` |
-| **Upstream** | `Wan-AI/Wan2.1-T2V-1.3B`, `facebook/VGGT-1B` | WAN base + IDM backbone (not re-hosted) |
+| **DROID** | `wan-droid-14b/` | DROID WAN planner (DiT-only bf16, ~31 GB) + `algo_config.yaml` |
+| | `droid-demo-clips/` | sample multi-view robot clips for the generation walkthrough (~100 MB) |
+| **Upstream** | `Wan-AI/Wan2.1-T2V-1.3B`, `Wan-AI/Wan2.1-I2V-14B-480P`, `facebook/VGGT-1B` | WAN bases + IDM backbone (not re-hosted) |
 
 **Download** (with the HuggingFace CLI — `pip install huggingface_hub`):
 
@@ -190,11 +214,12 @@ frozen upstream pieces are pulled from their original homes.
 # (1) MimicGen + PushT only — IDM + video planner for the Wave-1 notebooks   (~15 GB)
 hf download sizhe-lester-li/VERA --local-dir ./vera-ckpts \
 
-# (2) everything — also pulls the 33 GB OMNI planner + DROID IDM (Wave 2)      (~42 GB)
+# (2) everything — also pulls the 33 GB OMNI planner, DROID IDM, and the
+#     31 GB DROID WAN planner for the generation walkthrough                   (~73 GB)
 hf download sizhe-lester-li/VERA --local-dir ./vera-ckpts
 ```
 
-The Wave-1 download is **~15 GB (11.3 GB of it the VGGT-based MimicGen IDM)**; the full repo is **~42 GB** (the 33 GB OMNI WAN planner dominates).
+The Wave-1 download is **~15 GB (11.3 GB of it the VGGT-based MimicGen IDM)**; the full repo is **~73 GB** (the 33 GB OMNI planner and the 31 GB DROID planner dominate).
 Then point the server/notebook at the downloaded paths (`--algo-config`, `VERA_PUSHT_*` / `VERA_WAN_CKPT_ROOT`).
 
 **OMNI training data (Wave 2):** the cross-embodiment OMNI WAN planner is trained on a weighted mixture of
