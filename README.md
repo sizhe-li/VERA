@@ -32,6 +32,35 @@ translate that dream into actions:
 
 ---
 
+<a id="news"></a>
+## 🔥 News
+
+**Jul 12, 2026 — DROID: language-conditioned video generation (no robot required).**
+If you want to see the planner itself at work before setting up any simulator, start here: the
+notebook continues the same real context frames under different language prompts, and the
+generated futures differ accordingly (the executed outputs ship in the notebook, so you can
+inspect them before running anything). It runs the DROID WAN planner directly — single GPU,
+~60 GB VRAM (bf16); no server, no sim.
+
+If you **do** have a DROID setup, the same notebook doubles as a **zero-shot test of whether the
+checkpoint generalizes to your scene**: record short clips from your own cameras, swap them in for
+the bundled ones, and inspect how well the generated futures follow your prompts in your scene —
+before anything runs on the robot.
+
+**1. Point at the downloaded checkpoints:**
+```bash
+export VERA_DROID_CKPT_DIR=./vera-ckpts/wan-droid-14b       # DROID WAN planner (DiT + algo_config.yaml)
+export VERA_WAN14B_CKPT_ROOT=/path/to/Wan2.1-I2V-14B-480P   # frozen Wan2.1 base (text-enc + VAE + CLIP)
+```
+**2. Run the notebook:** open **`examples/droid_generation.ipynb`** → **Run All**.
+
+- two experiments on the bundled sample clips (`examples/droid_demo_videos/`, three synchronized
+  DROID cameras): the same prompt from five start times, and three different prompts from the same
+  start frame (context frames red-bordered, generation follows);
+- context length and guidance come from the checkpoint's `algo_config.yaml`.
+
+---
+
 ## 🗺️ Release roadmap
 
 _Last updated: **Jul 12, 2026**._
@@ -112,7 +141,7 @@ notebook in another. The notebook drives the sim, prints the success rate, and i
 |---|---|---|
 | **PushT** — planar push-to-goal | `--embodiment pusht` | **`examples/pusht_dfot_stack.ipynb`** |
 | **MimicGen** — 2-block stacking | `--embodiment mimicgen` | **`examples/mimicgen_stack.ipynb`** |
-| **DROID** — video generation from language | *(no server needed)* | **`examples/droid_generation.ipynb`** |
+| **DROID** — video generation from language | *(no server needed)* | **`examples/droid_generation.ipynb`** — setup in [🔥 News](#news) |
 
 ### PushT (DFoT planner — small, loads in seconds)
 
@@ -148,26 +177,6 @@ python -m vera.server.start_vera_server --embodiment mimicgen --port 8800 --vis-
 
 - swap pieces live via env vars on the server: `VERA_DYNAMICS_RUN_ID` (IDM checkpoint),
   `VERA_TRACKER_BACKEND`, `VERA_MOTION_PLAN_SCALE`, `VERA_N_ACTION_STEPS`.
-
-### DROID — language-conditioned video generation (no robot required)
-
-If you want to see the planner itself at work before setting up any simulator, start here: the
-notebook continues the same real context frames under different language prompts, and the
-generated futures differ accordingly (the executed outputs ship in the notebook, so you can
-inspect them before running anything). It runs the DROID WAN planner directly — single GPU,
-~60 GB VRAM (bf16); no server, no sim.
-
-**1. Point at the downloaded checkpoints:**
-```bash
-export VERA_DROID_CKPT_DIR=./vera-ckpts/wan-droid-14b       # DROID WAN planner (DiT + algo_config.yaml)
-export VERA_WAN14B_CKPT_ROOT=/path/to/Wan2.1-I2V-14B-480P   # frozen Wan2.1 base (text-enc + VAE + CLIP)
-```
-**2. Run the notebook:** open **`examples/droid_generation.ipynb`** → **Run All**.
-
-- two experiments on the bundled sample clips (`examples/droid_demo_videos/`, three synchronized
-  DROID cameras): the same prompt from five start times, and three different prompts from the same
-  start frame (context frames red-bordered, generation follows);
-- context length and guidance come from the checkpoint's `algo_config.yaml`.
 
 ---
 
