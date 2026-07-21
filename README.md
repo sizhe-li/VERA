@@ -261,6 +261,11 @@ Released under the **MIT License** (see `LICENSE`); depended-upon code retains i
 `NOTICE`). VERA builds on **Wan2.1** (Apache-2.0), **VGGT** (Meta), **CLIP/open_clip** (MIT), and
 **cotracker/AllTracker**; the DFoT/DiT backbones are adapted from `facebookresearch/DiT` and `NVlabs/edm2`.
 
+**Checkpoint licenses:** the hosted weights are Apache-2.0, except `idm-droid/` and
+`idm-mimicgen-285ouq1q/`, which bundle the **VGGT-1B** backbone weights
+([CC-BY-NC-4.0](https://huggingface.co/facebook/VGGT-1B)) and are therefore **non-commercial**.
+Per-checkpoint details are on the [HF model card](https://huggingface.co/sizhe-lester-li/VERA).
+
 ```bibtex
 @article{li2026turningvideomodelsgeneralist,
       title={Turning Video Models into Generalist Robot Policies}, 
